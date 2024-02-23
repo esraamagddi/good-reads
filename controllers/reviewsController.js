@@ -8,7 +8,10 @@ const addReview = catchAsync(async (req, res, next) => {
 });
 
 const editReview = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
+  const  id  = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError('Invalid review ID', 400));
+  }
   const updatedReview = await Review.findByIdAndUpdate(id, req.body, { new: true });
 
   if (!updatedReview) {
@@ -19,7 +22,10 @@ const editReview = catchAsync(async (req, res, next) => {
 });
 
 const deleteReview = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
+  const  id  = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError('Invalid review ID', 400));
+  }
   const deletedReview = await Review.findByIdAndDelete(id);
 
   if (!deletedReview) {
@@ -30,7 +36,10 @@ const deleteReview = catchAsync(async (req, res, next) => {
 });
 
 const getReviewById = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
+  const  id  = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError('Invalid review ID', 400));
+  }
   const review = await Review.findById(id);
 
   if (!review) {

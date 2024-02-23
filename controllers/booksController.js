@@ -4,7 +4,7 @@ const Book = require('../models/booksModel');
 const upload = require('../helpers/uploadImg');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
-
+const mongoose = require('mongoose');
 const getAllBooks = catchAsync(async (req, res, next) => {
     const books = await Book.find({})
         .populate('author', 'firstName lastName'); 
@@ -38,6 +38,11 @@ const addBook = catchAsync(async (req, res, next) => {
 
 const getBookDetails = catchAsync(async (req, res, next) => {
     const bookId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(bookId)) {
+        return next(new AppError('Invalid book ID', 400));
+    }
+
     const book = await Book.findById(bookId);
 
     if (!book) {
@@ -48,30 +53,43 @@ const getBookDetails = catchAsync(async (req, res, next) => {
 });
 
 const updateBook = catchAsync(async (req, res, next) => {
-    const bookId = req.params.id;
-    const updates = req.body;
-
-    if (req.file) {
-        updates.image = req.file.path;
-    }
-
-    try {
-        const book = await Book.findByIdAndUpdate(bookId, updates, { new: true });
-
-        if (!book) {
-            return next(new AppError('Book not found', 404));
+    upload.single('image')(req, res, async (err) => {
+        if (err) {
+            return next(new AppError(err.message, 400));
         }
 
-        res.status(200).json(book);
-    } catch (error) {
-        return next(new AppError('Error updating book', 500));
-    }
-})
+        const bookId = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(bookId)) {
+            return next(new AppError('Invalid book ID', 400));
+        }
+        const updates = req.body;
+
+        if (req.file) {
+            updates.image = req.file.path;
+        }
+
+        try {
+            const book = await Book.findByIdAndUpdate(bookId, updates, { new: true });
+
+            if (!book) {
+                return next(new AppError('Book not found', 404));
+            }
+
+            res.status(200).json(book);
+        } catch (error) {
+            return next(new AppError('Error updating book', 500));
+        }
+    });
+});
+
 
 
 
 const deleteBook = catchAsync(async (req, res, next) => {
     const bookId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(bookId)) {
+        return next(new AppError('Invalid book ID', 400));
+    }
     const book = await Book.findById(bookId);
 
     if (!book) {

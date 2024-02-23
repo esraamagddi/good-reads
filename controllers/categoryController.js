@@ -1,6 +1,7 @@
 const Category = require('../models/categoryModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const mongoose = require('mongoose');
 
 exports.getAllCategories = catchAsync(async (req, res, next) => {
     const categories = await Category.find();
@@ -15,7 +16,9 @@ exports.getAllCategories = catchAsync(async (req, res, next) => {
 
 exports.getCategoryById = catchAsync(async (req, res, next) => {
     const categoryId = req.params.id;
-
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+        return next(new AppError('Invalid category ID', 400));
+    }
         const category = await Category.findById(categoryId)
             .populate('author', 'firstName lastName') 
             .populate('category', 'name'); 

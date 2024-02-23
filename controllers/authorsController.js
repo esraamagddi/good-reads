@@ -3,6 +3,7 @@ const Book = require('../models/booksModel');
 const upload = require('../helpers/uploadImg');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const mongoose = require('mongoose');
 
 const createAuthor = catchAsync(async (req, res, next) => {
     upload.single('image')(req, res, async (err) => {
@@ -31,17 +32,17 @@ const getAllAuthors = catchAsync(async (req, res, next) => {
     res.json(authors);
 });
 
-const getAuthorById = catchAsync(async (req, res) => {
+const getAuthorById = catchAsync(async (req, res, next) => {
     const authorId = req.params.id;
-    // console.log(authorId);
-    // if(    mongoose.isValidObjectId){
 
-    // }
+    if (!mongoose.Types.ObjectId.isValid(authorId)) {
+        return next(new AppError('Invalid author ID', 400));
+    }
+
+    try {
         const author = await Author.findById(authorId);
         if (!author) {
-            console.log("nnn") ;
-
-            return next(new AppError('CastError', 400));
+            return next(new AppError('Author not found', 404));
         }
 
         const books = await Book.find({ author: authorId }).exec();
@@ -62,32 +63,52 @@ const getAuthorById = catchAsync(async (req, res) => {
         };
 
         res.json(response);
-
-
+    } catch (error) {
+        return next(new AppError('Error while fetching author', 500));
+    }
 });
 
 
 const updateAuthorById = catchAsync(async (req, res, next) => {
     const authorId = req.params.id;
-    const updates = req.body;
 
-    if (req.file) {
-        updates.image = req.file.path;
+    if (!mongoose.Types.ObjectId.isValid(authorId)) {
+        return next(new AppError('Invalid author ID', 400));
     }
 
-    const author = await Author.findByIdAndUpdate(authorId, updates, { new: true });
+    upload.single('image')(req, res, async (err) => {
+        if (err) {
+            return next(new AppError(err.message, 400));
+        }
 
-    if (!author) {
-        return next(new AppError('Author not found', 404));
-    }
 
-    res.json(author);
+            const updates = req.body;
+            
+            if (req.file) {
+                updates.image = req.file.path;
+            }
+
+            const author = await Author.findByIdAndUpdate(authorId, updates, { new: true });
+
+            if (!author) {
+                return next(new AppError('Author not found', 404));
+            }
+
+            res.json(author);
+
+    });
 });
 
 
 
+
 const deleteAuthorById = catchAsync(async (req, res, next) => {
-    const author = await Author.findByIdAndDelete(req.params.id);
+    const authorId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(authorId)) {
+        return next(new AppError('Invalid author ID', 400));
+    }
+    const author = await Author.findByIdAndDelete(authorId);
+ 
     if (!author) {
         return next(new AppError('Author not found', 404));
     }
