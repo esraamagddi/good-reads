@@ -42,13 +42,13 @@ const sendErrorProd = (err, req, res) => {
 };
 
 module.exports = (err, req, res, next) => {
-  if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, req, res);
-  } else if (process.env.NODE_ENV === 'production') {
+  // if (process.env.NODE_ENV === 'development') {
+    // sendErrorDev(err, req, res);
+  // } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code ===11000) error=handleDuplicateErrorDB(error);
     if (error.name === 'ValidationError') error =handleValidationErrorDB(error);
     sendErrorProd(error, req, res);
-  }
+  // }
 };

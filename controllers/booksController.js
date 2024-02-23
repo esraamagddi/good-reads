@@ -49,23 +49,24 @@ const getBookDetails = catchAsync(async (req, res, next) => {
 
 const updateBook = catchAsync(async (req, res, next) => {
     const bookId = req.params.id;
-    const updates = req.formData;
-    
+    const updates = req.body;
+
     if (req.file) {
         updates.image = req.file.path;
     }
-    const options = { new: true }; 
 
-    const book = await Book.findOneAndUpdate({ _id: bookId }, updates, options);
+    try {
+        const book = await Book.findByIdAndUpdate(bookId, updates, { new: true });
 
+        if (!book) {
+            return next(new AppError('Book not found', 404));
+        }
 
-
-    if (!book) {
-        return next(new AppError('Book not found', 404));
+        res.status(200).json(book);
+    } catch (error) {
+        return next(new AppError('Error updating book', 500));
     }
-
-    res.status(200).json(book);
-});
+})
 
 
 

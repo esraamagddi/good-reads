@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const helmet = require('helmet');
 
 const AppError=require('./utils/AppError');
-const errorHandler=require('./middlewares/errorMiddleware');
+// const errorHandler=require('./middlewares/errorMiddleware');
 const app = express();
 app.use(express.json());
 app.use(helmet());
@@ -35,10 +35,10 @@ app.all('*', (req, res,next)=> {
   next(new AppError(`couldn\'t find ${req.originalUrl} on this server`,404));
 })
 
-// app.use((err, req, res, next) => {
-//   res.status(404).json({ error: err.message });
-//   });
-
+app.use((err, req, res, next) => {
+  res.status(404).json({ error: err.message });
+  });
+// app.use((error, req, res, next) => res.status(error.status).json({ error: error.message }));
 const PORT = process.env.PORT || 3000;
 
 
@@ -55,11 +55,11 @@ const PORT = process.env.PORT || 3000;
 //   );
 //   next();
 // });
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  // Handle the error or log it
-});
-app.use(errorHandler);
+// process.on('unhandledRejection', (err) => {
+//   console.error('Unhandled Rejection:', err);
+//   // Handle the error or log it
+// });
+// app.use(errorHandler);
 
 app.listen(PORT, () => {
   `

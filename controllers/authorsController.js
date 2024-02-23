@@ -32,12 +32,16 @@ const getAllAuthors = catchAsync(async (req, res, next) => {
 });
 
 const getAuthorById = catchAsync(async (req, res) => {
-        const authorId = req.params.id;
+    const authorId = req.params.id;
+    // console.log(authorId);
+    // if(    mongoose.isValidObjectId){
 
-        const author = await Author.findById(authorId).exec();
-
+    // }
+        const author = await Author.findById(authorId);
         if (!author) {
-            return res.status(404).json({ message: 'Author not found' });
+            console.log("nnn") ;
+
+            return next(new AppError('CastError', 400));
         }
 
         const books = await Book.find({ author: authorId }).exec();
@@ -59,25 +63,27 @@ const getAuthorById = catchAsync(async (req, res) => {
 
         res.json(response);
 
+
 });
 
 
 const updateAuthorById = catchAsync(async (req, res, next) => {
-    try {
-        const updates = {};
-        Object.keys(req.body).forEach((key) => {
-            updates[key] = req.body[key];
-        });
+    const authorId = req.params.id;
+    const updates = req.body;
 
-        const author = await Author.findOneAndUpdate({ _id: req.params.id }, updates, { new: true, runValidators: true });
-        if (!author) {
-            return next(new AppError('Author not found', 404));
-        }
-        res.json(author);
-    } catch (error) {
-        return next(error);
+    if (req.file) {
+        updates.image = req.file.path;
     }
+
+    const author = await Author.findByIdAndUpdate(authorId, updates, { new: true });
+
+    if (!author) {
+        return next(new AppError('Author not found', 404));
+    }
+
+    res.json(author);
 });
+
 
 
 const deleteAuthorById = catchAsync(async (req, res, next) => {
