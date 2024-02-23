@@ -100,4 +100,13 @@ const deleteBook = catchAsync(async (req, res, next) => {
     res.json({ message: 'Deleted Book' });
 });
 
-module.exports = { getAllBooks, addBook, getBookDetails, updateBook, deleteBook };
+const getPopularBooks = catchAsync(async (req, res, next) => {
+  
+ const currentlyReadingBooks = await Book.find({ status: "Currently Reading" }).populate('author');
+
+        res.json(currentlyReadingBooks);
+
+});
+
+
+module.exports = { getAllBooks, addBook, getBookDetails, updateBook, deleteBook,getPopularBooks };

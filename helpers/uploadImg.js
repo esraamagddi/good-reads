@@ -3,13 +3,13 @@ const multer = require('multer');
 const path = require('path');
 
 const fileFilter = (req, file, cb) => {
-    const whiteList = ['.jpg', '.jpeg', '.png'];
+    const whiteList = ['.jpg', '.jpeg', '.png', '.gif'];
 
     const extname = path.extname(file.originalname).toLowerCase();
     if (whiteList.includes(extname)) {
         cb(null, true);
     } else {
-        cb(new Error('Only .jpg, .jpeg, and .png files are allowed'));
+        cb(new Error('Only .jpg, .jpeg, .gif and .png files are allowed'));
     }
 };
 

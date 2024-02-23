@@ -21,10 +21,15 @@ const createAuthor = catchAsync(async (req, res, next) => {
             image: imagePath
         };
 
-        const author = await Author.create(authorData);
-        res.status(201).json(author);
+        const author = new Author(authorData);
+
+        const savedAuthor = await author.save();
+
+        res.status(201).json(savedAuthor);
+
     });
 });
+
 
 
 const getAllAuthors = catchAsync(async (req, res, next) => {

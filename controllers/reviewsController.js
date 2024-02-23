@@ -1,6 +1,7 @@
 const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const mongoose = require('mongoose');
 
 const addReview = catchAsync(async (req, res, next) => {
   const review = await Review.create(req.body);
@@ -8,7 +9,7 @@ const addReview = catchAsync(async (req, res, next) => {
 });
 
 const editReview = catchAsync(async (req, res, next) => {
-  const  id  = req.params;
+  const id = req.params.id; 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return next(new AppError('Invalid review ID', 400));
   }
@@ -22,7 +23,7 @@ const editReview = catchAsync(async (req, res, next) => {
 });
 
 const deleteReview = catchAsync(async (req, res, next) => {
-  const  id  = req.params;
+  const id = req.params.id; 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return next(new AppError('Invalid review ID', 400));
   }
@@ -36,7 +37,7 @@ const deleteReview = catchAsync(async (req, res, next) => {
 });
 
 const getReviewById = catchAsync(async (req, res, next) => {
-  const  id  = req.params;
+  const id = req.params.id; 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return next(new AppError('Invalid review ID', 400));
   }
