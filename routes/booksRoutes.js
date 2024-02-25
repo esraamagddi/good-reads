@@ -1,12 +1,20 @@
-const express=require('express');
-const { getAllBooks, addBook, getBookDetails, updateBook, deleteBook } = require('../controllers/booksController');
+const express = require("express");
+const booksRouter = express.Router();
+const { authorizeAdminsPriv } = require("../middlewares/globalPriv");
+const { getAllBooks, getBook, getBookById, updateBook, addBook, deleteBook, editUserBookState, addUserBook, editUserBookRating, editUserBookReview, getBookReview,getUserBooks } = require('../controllers/booksController');
 
-const booksRoutes=express.Router();
+booksRouter.get("/", getAllBooks);
+booksRouter.get("/", getBook);
+booksRouter.get("/:id", getBookById);
+booksRouter.patch("/:id", authorizeAdminsPriv, updateBook);
+booksRouter.post("/", authorizeAdminsPriv, addBook);
+booksRouter.delete("/:id", authorizeAdminsPriv, deleteBook);
 
-booksRoutes.get('/', getAllBooks); //done
-booksRoutes.post('/', addBook); //almost done
-booksRoutes.get('/:id', getBookDetails); //done
-booksRoutes.patch('/:id', updateBook); 
-booksRoutes.delete('/:id', deleteBook); 
+booksRouter.patch("/userBook", editUserBookState);
+booksRouter.post("/userBook", addUserBook);
+booksRouter.patch("/userBook/state/:id", editUserBookRating);
+booksRouter.patch("/userBook/review/:id", editUserBookReview);
+booksRouter.get("/userBook/review/:id", getBookReview);
+app.get("/isLoged", getUserBooks)
 
-module.exports = booksRoutes;
+module.exports = booksRouter;
