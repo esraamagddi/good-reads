@@ -13,7 +13,7 @@ const app = express();
 // //const { DB_URI, PORT } = configs[ENV];
 
 mongoose
-  .connect("mongodb+srv://mean_iti:8x40gOfqZ7QddH7R@cluster1.b5xqlxg.mongodb.net/")
+  .connect("mongodb+srv://MEANn_ITI:pass123@cluster2.jabwzqc.mongodb.net/")
   .then(() => {
     console.log("connected to mongodb");
     app.listen(3000, (err) => {
@@ -36,7 +36,7 @@ app.use("/public", express.static("public/"));
 // add resources routers
 app.use("/auth", require("./routes/auth"));
 
-app.use('/users',isAdmin,require('./routes/user'));
+app.use('/users',require('./routes/user'));
 
 
 
